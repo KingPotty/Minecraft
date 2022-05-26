@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     public float ySensitivity { get; private set; }
     public float moveSpeed { get; private set; }
     public float gravity { get; private set; }
+    public float jumpSpeed;
 
     public Camera playerCamera;
 
@@ -21,7 +22,6 @@ public class PlayerController : MonoBehaviour
         ySensitivity = 5;
         moveSpeed = 5;
         gravity = 9.8f;
-
     }
 
     // Update is called once per frame
@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
     {
         UpdateMouse();
         UpdateMovement();
-        UpdateGravity();
+        UpdateYSpeed();
     }
 
     // calculates how far the mouse has moved, and rotates the player and camera accordingly
@@ -55,20 +55,28 @@ public class PlayerController : MonoBehaviour
         {
             velocity *= 2;
         }
-        cc.Move(velocity * Time.deltaTime * moveSpeed);
+
+        cc.SimpleMove(velocity * moveSpeed);
+        if (!cc.isGrounded)
+        {
+            print(cc.isGrounded);
+        }
     }
 
-    private void UpdateGravity()
+    private void UpdateYSpeed()
     {
-        if (cc.isGrounded)
+        if (Input.GetKey(KeyCode.Space) && cc.isGrounded)
         {
-            velocityY = 0;
-        } 
-        else
-        {
-            velocityY -= gravity * Time.deltaTime;
+            print("jump");
+            velocityY = jumpSpeed;
         }
 
+        else if (cc.isGrounded)
+        {
+            velocityY = 0;
+        }
+
+        velocityY -= gravity * Time.deltaTime;
         cc.Move(new Vector3(0, velocityY, 0) * Time.deltaTime);
     }
 }
